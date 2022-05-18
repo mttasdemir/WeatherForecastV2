@@ -1,0 +1,42 @@
+{
+  "request": {
+    "type": "City",
+    "query": "Istanbul, Turkey",
+    "language": "en",
+    "unit": "m"
+  },
+  "location": {
+    "name": "Istanbul",
+    "country": "Turkey",
+    "region": "Istanbul",
+    "lat": "41.019",
+    "lon": "28.965",
+    "timezone_id": "Europe/Istanbul",
+    "localtime": "2022-05-15 22:20",
+    "localtime_epoch": 1652653200,
+    "utc_offset": "3.0"
+  },
+  "current": {
+    "observation_time": "07:20 PM",
+    "temperature": 20,
+    "weather_code": 113,
+    "weather_icons": [
+      "https://assets.weatherstack.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
+    ],
+    "weather_descriptions": [
+      "Clear"
+    ],
+    "wind_speed": 11,
+    "wind_degree": 30,
+    "wind_dir": "NNE",
+    "pressure": 1018,
+    "precip": 0,
+    "humidity": 60,
+    "cloudcover": 0,
+    "feelslike": 20,
+    "uv_index": 1,
+    "visibility": 10,
+    "is_day": "no"
+  }
+}
+

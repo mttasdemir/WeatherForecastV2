@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct WeatherForecast2App: App {
+    @StateObject private var controller = ForecastController()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ForecastView(forecastController: controller)
         }
     }
 }
