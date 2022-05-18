@@ -105,11 +105,11 @@ struct ForecastView: View {
                     Spacer()
                     ZStack {
                         RoundedRectangle(cornerRadius: 10)
-                            .foregroundColor(.white.opacity(0.5))
+                            .foregroundColor(.white.opacity(0.9))
                             .frame(maxHeight: 150)
                         Picker("City", selection: $newCity) {
                             ForEach(forecastController.allCities, id: \.self) { city in
-                                Text(city).font(.title)
+                                Text(city).font(.title).fontWeight(.semibold)
                             }
                         }
                         .pickerStyle(WheelPickerStyle())

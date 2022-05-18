@@ -12,16 +12,15 @@ class ForecastController: ObservableObject {
     static private let accessKey = "f3b3cb12d326f2f5bfb3be1b35169831"
     static private let baseUrl = "http://api.weatherstack.com/current"
     
-    @Published var cities: Array<City> = [City.sampleData]
+    @Published var cities: Array<City> = []
     var error: ForecastError?
     
-    let citySet = ["İstanbul" : "Istanbul", "İzmir" : "Izmir", "Ankara" : "Ankara"]
-//    , "Kayseri" : "Kayseri", "Çanakkale" : "Canakkale", "Aydın" : "Aydin", "Adana" : "Adana", "Muğla" : "Mugla", "Antalya" : "Antalya", "Washington" : "Washington", "New York" : "New%20York"]
+    let citySet = ["İstanbul" : "Istanbul", "İzmir" : "Izmir", "Ankara" : "Ankara", "Kayseri" : "Kayseri", "Çanakkale" : "Canakkale", "Aydın" : "Aydin", "Adana" : "Adana", "Muğla" : "Mugla", "Antalya" : "Antalya", "Washington" : "Washington", "New York" : "New%20York"]
     
     var allCities: Array<String> {
         citySet.keys.filter { cityName in
             !cities.contains { $0.name == cityName }
-        }.sorted()
+        }.sorted(by: { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending })
     }
     
     // MARK: - Intensions
@@ -70,3 +69,4 @@ class ForecastController: ObservableObject {
 enum ForecastError: Error {
     case invalidUrl, invalidServerResponse
 }
+
