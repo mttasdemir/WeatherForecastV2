@@ -45,6 +45,7 @@ class ForecastController: ObservableObject {
         decoder.dateDecodingStrategy = .secondsSince1970
         var city = try decoder.decode(City.self, from: data)
         city.name = name
+        try await save(name)
         DispatchQueue.main.async { [city] in
             self.cities.append(city)
         }
@@ -61,6 +62,27 @@ class ForecastController: ObservableObject {
     func remove(_ city: City) {
         if let index = cities.firstIndex(where: { $0.id == city.id }) {
             cities.remove(at: index)
+        }
+    }
+    
+    func save(_ name: String) async throws {
+        // xcrun simctl get_app_container booted tr.tasdemir.app.test.WeatherForecast2 data
+        var cityList = cities.map { $0.name }
+        cityList.append(name)
+        let direcUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+        let fileUrl = direcUrl?.appendingPathComponent("Cities.json")
+        let jsonData = try JSONEncoder().encode(cityList)
+        try jsonData.write(to: fileUrl!)
+    }
+    
+    func load() async {
+        guard let fileUrl = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                .appendingPathComponent("Cities.json") else { return }
+        
+        guard let jsonData = try? FileHandle(forReadingFrom: fileUrl).availableData else { return }
+        guard let nameList = try? JSONDecoder().decode(Array<String>.self, from: jsonData) else { return }
+        for name in nameList {
+            try? await addCity(name)
         }
     }
     

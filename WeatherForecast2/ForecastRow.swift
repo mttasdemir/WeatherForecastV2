@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ForecastRow: View {
     let city: City
-    
+    let unit: Unit
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -19,7 +19,7 @@ struct ForecastRow: View {
             Spacer()
             HStack {
                 VStack {
-                    Text("\(city.forecast?.temperature ?? 0)\u{00B0}").font(.system(size: 40))
+                    Text("\(city.temperature(in: unit))\u{00B0}").font(.system(size: 40))
                     Text(city.forecast?.weatherDescriptions[0] ?? "-").font(.caption)
                         .padding(.trailing, 15)
                 }
@@ -43,6 +43,6 @@ struct ForecastRow: View {
 
 struct ForecastRow_Previews: PreviewProvider {
     static var previews: some View {
-        ForecastRow(city: City.sampleData)
+        ForecastRow(city: City.sampleData, unit: .celsius)
     }
 }

@@ -57,6 +57,14 @@ struct City: Identifiable, Decodable {
         self.localTime = localTime
         self.geoPosition = GeoPosition()
     }
+    
+    func temperature(in unit: Unit) -> String {
+        guard let forecast = forecast else { return "-" }
+        switch unit {
+        case .celsius: return String(forecast.temperature)
+        case .fahrenheit: return String(Int(Double(forecast.temperature) * 1.8 + 32))
+        }
+    }
 }
 
 extension City {
@@ -81,3 +89,6 @@ extension City {
     
 }
 
+enum Unit {
+    case celsius, fahrenheit
+}

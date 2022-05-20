@@ -12,7 +12,7 @@ struct ForecastView: View {
     let linearGradient = LinearGradient(colors: [.white, .blue], startPoint: .top, endPoint: .bottom)
     @State private var temp: Array<City> = []
     
-    @State private var unit: Int = 1
+    @State private var unit: Unit = .celsius
     @State private var newCity: String = ""
     @State private var editMode: EditMode = .inactive
     @State private var isAddingCity: Bool = false
@@ -32,7 +32,7 @@ struct ForecastView: View {
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(rowGradient)
-                        ForecastRow(city: city)
+                        ForecastRow(city: city, unit: unit)
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button(role: .destructive, action: { forecastController.remove(city) }, label: { Image(systemName: "trash.fill")})
@@ -83,6 +83,9 @@ struct ForecastView: View {
                 }
             }
         }
+        .task {
+            await forecastController.load()
+        }
         .overlay {
             citySelectMenu
         }
@@ -131,8 +134,8 @@ struct ForecastView: View {
                 editMode = .active
             } label: { Label("Edit", systemImage: "pencil") }
             Picker("Unit", selection: $unit) {
-                Text("Celsius").tag(1)
-                Text("Fahrenheit").tag(2)
+                Text("Celsius").tag(Unit.celsius)
+                Text("Fahrenheit").tag(Unit.fahrenheit)
             }
             Button {
                 temp = forecastController.cities
