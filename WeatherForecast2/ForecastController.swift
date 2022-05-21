@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import Combine
+import UIKit
 
 class ForecastController: ObservableObject {
-    //http://api.weatherstack.com/current?access_key=f3b3cb12d326f2f5bfb3be1b35169831&query=Istanbul
-    static private let accessKey = "f3b3cb12d326f2f5bfb3be1b35169831"
+    //http://api.weatherstack.com/current?access_key=e77cafb5f2192008930eeffad7714999&query=Istanbul
+    static private let accessKey = "220b4c331da4e57234d168169932a3d8"
     static private let baseUrl = "http://api.weatherstack.com/current"
     
     @Published var cities: Array<City> = []
@@ -51,24 +53,53 @@ class ForecastController: ObservableObject {
         }
     }
     
+    var cancellable: Array<AnyCancellable> = []
+    func addCityV2(_ name: String) throws {
+        let url = ForecastController.baseUrl + "?access_key=\(ForecastController.accessKey)&query=\(citySet[name]!)"
+        guard let url = URL(string: url) else { throw ForecastError.invalidUrl }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .secondsSince1970
+        URLSession.shared
+            .dataTaskPublisher(for: url)
+            .tryMap({(data, response) -> Data in
+                if (response as? HTTPURLResponse)?.statusCode != 200 {
+                    throw ForecastError.invalidServerResponse
+                }
+                return data
+            })
+            .decode(type: City.self, decoder: decoder)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished: break
+                case .failure(_): break
+                }
+            }, receiveValue: { city in
+                self.cities.append(city)
+            }).store(in: &cancellable)
+    }
+    
     func refreshForecast() async {
-        let temp = cities
         cities.removeAll()
-        for city in temp {
-            try? await addCity(city.name)
-        }
+        await load()
     }
     
     func remove(_ city: City) {
         if let index = cities.firstIndex(where: { $0.id == city.id }) {
             cities.remove(at: index)
+            Task {
+                try? await save()
+            }
         }
     }
     
-    func save(_ name: String) async throws {
+    func save(_ name: String? = nil) async throws {
         // xcrun simctl get_app_container booted tr.tasdemir.app.test.WeatherForecast2 data
         var cityList = cities.map { $0.name }
-        cityList.append(name)
+        if let name = name {
+            cityList.append(name)
+        }
         let direcUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
         let fileUrl = direcUrl?.appendingPathComponent("Cities.json")
         let jsonData = try JSONEncoder().encode(cityList)
